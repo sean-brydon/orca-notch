@@ -115,6 +115,7 @@ struct AgentDetailPane: View {
                     .textFieldStyle(.plain)
                     .font(.system(size: 13))
                     .foregroundStyle(.white)
+                    .autocorrectionDisabled()
                     .focused($inputFocused)
                     .onSubmit {
                         guard !draft.isEmpty else { return }

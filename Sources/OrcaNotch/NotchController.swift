@@ -40,6 +40,27 @@ final class NotchModel: ObservableObject {
 final class NotchPanel: NSPanel {
     override var canBecomeKey: Bool { true }
     override var canBecomeMain: Bool { false }
+
+    /// Replies go straight into agent terminals, so the field editor must type exactly what
+    /// was typed: no autocorrect, text replacement, smart quotes/dashes or inline predictions.
+    /// Why configure rather than replace: SwiftUI force-casts to its own field editor subclass.
+    override func fieldEditor(_ createFlag: Bool, for object: Any?) -> NSText? {
+        let editor = super.fieldEditor(createFlag, for: object)
+        if let textView = editor as? NSTextView {
+            textView.isAutomaticSpellingCorrectionEnabled = false
+            textView.isContinuousSpellCheckingEnabled = false
+            textView.isGrammarCheckingEnabled = false
+            textView.isAutomaticTextReplacementEnabled = false
+            textView.isAutomaticQuoteSubstitutionEnabled = false
+            textView.isAutomaticDashSubstitutionEnabled = false
+            textView.isAutomaticTextCompletionEnabled = false
+            textView.isAutomaticLinkDetectionEnabled = false
+            textView.isAutomaticDataDetectionEnabled = false
+            textView.smartInsertDeleteEnabled = false
+            textView.inlinePredictionType = .no
+        }
+        return editor
+    }
 }
 
 @MainActor
