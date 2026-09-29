@@ -17,8 +17,7 @@ Requires the Orca app running with the `orca` CLI installed (`/usr/local/bin/orc
 - **New alert:** the notch peeks down for 5s with the agent + what it wants, and plays a sound.
 - **Open:** hover the notch (closes when you leave), click it or press **⌥⌘O** (stays open; Esc or
   click outside to close).
-- **Pull-down:** pick an agent → live screen (refreshes every 1s), quick keys (1/2/3, ⏎, esc, ⇧tab,
-  arrows, ⌃C) and a reply box that sends text + Enter. "Open in Orca" focuses that terminal in Orca.
+- **Pull-down:** pick an agent → a card with your last prompt, its last reply (markdown), and when it is blocked/asking, the menu from its screen as buttons (fallback Approve / Always / Deny). Reply box sends text + Enter. The terminal toggle shows the styled raw screen with quick keys. "Orca" focuses that terminal in Orca.
 - Gear menu: sound, launch at login, clear finished, rescan environments, quit.
 
 ## How it works

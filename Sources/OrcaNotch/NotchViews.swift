@@ -209,7 +209,7 @@ struct ExpandedView: View {
             header
             HStack(spacing: 12) {
                 AgentListView().frame(width: 290)
-                TerminalPane()
+                AgentDetailPane()
             }
             .padding(.horizontal, 14)
             .padding(.bottom, 14)
@@ -367,74 +367,7 @@ struct AgentRowView: View {
     }
 }
 
-// MARK: - Terminal
-
-struct TerminalPane: View {
-    @EnvironmentObject var model: NotchModel
-    @EnvironmentObject var store: AgentStore
-    @State private var draft = ""
-    @FocusState private var inputFocused: Bool
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            if let agent = store.selectedAgent {
-                HStack(spacing: 8) {
-                    Text(agent.headline.uppercased())
-                        .font(.system(size: 9.5, weight: .bold)).kerning(0.5)
-                        .foregroundStyle(.black)
-                        .padding(.horizontal, 6).padding(.vertical, 2)
-                        .background(Capsule().fill(agent.state.color))
-                    Text(agent.title).font(.system(size: 12.5, weight: .semibold)).foregroundStyle(.white).lineLimit(1)
-                    Spacer(minLength: 6)
-                    Button { store.openInOrca(agent) } label: {
-                        Label("Open in Orca", systemImage: "arrow.up.forward.app")
-                            .font(.system(size: 11, weight: .medium))
-                    }
-                    .buttonStyle(PillButtonStyle())
-                }
-
-                TerminalScreenView(lines: store.screenLines, status: store.screenStatus)
-
-                if agent.terminalHandle != nil {
-                    HStack(spacing: 5) {
-                        ForEach(QuickKey.all) { key in
-                            Button(key.label) { store.send(key.text, enter: key.enter) }
-                                .buttonStyle(PillButtonStyle(mono: true))
-                                .help(key.help)
-                        }
-                        Spacer(minLength: 0)
-                        if let err = store.sendError {
-                            Text(err).font(.system(size: 10)).foregroundStyle(.red).lineLimit(1)
-                        }
-                    }
-                    HStack(spacing: 8) {
-                        Image(systemName: "chevron.right").font(.system(size: 11, weight: .bold))
-                            .foregroundStyle(agent.state.color)
-                        TextField("Reply to \(agent.agentType)…  (⏎ to send)", text: $draft)
-                            .textFieldStyle(.plain)
-                            .font(.system(size: 12.5, design: .monospaced))
-                            .foregroundStyle(.white)
-                            .focused($inputFocused)
-                            .onSubmit {
-                                guard !draft.isEmpty else { return }
-                                store.send(draft, enter: true)
-                                draft = ""
-                            }
-                    }
-                    .padding(.horizontal, 12)
-                    .frame(height: 34)
-                    .background(RoundedRectangle(cornerRadius: 10).fill(Color.white.opacity(0.07)))
-                    .overlay(RoundedRectangle(cornerRadius: 10).stroke(inputFocused ? agent.state.color.opacity(0.6) : faint))
-                }
-            } else {
-                Spacer()
-                Text("Select an agent").font(.system(size: 12)).foregroundStyle(dim).frame(maxWidth: .infinity)
-                Spacer()
-            }
-        }
-        .onChange(of: model.focusInputToken) { _, _ in inputFocused = true }
-    }
-}
+// MARK: - Screen
 
 struct QuickKey: Identifiable {
     let label: String

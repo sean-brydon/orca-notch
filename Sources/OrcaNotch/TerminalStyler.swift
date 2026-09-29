@@ -176,3 +176,47 @@ enum TerminalStyler {
         return s
     }
 }
+
+/// Recovers "last thing you said / last thing the agent said" from a rendered agent screen,
+/// for agents whose hook status doesn't carry prompt/lastAssistantMessage.
+enum ScreenTranscript {
+    private static let toolCall = try! NSRegularExpression(pattern: #"^[A-Z][A-Za-z0-9_]*\("#)
+    private static let stops: Set<Character> = ["✻", "✳", "✶", "✢", "✽", "※", "❯", "›", "⎿", "─", "━", "⏵", "╭", "╰"]
+
+    static func extract(_ lines: [String]) -> (prompt: String?, reply: String?) {
+        let trimmed = lines.map { $0.replacingOccurrences(of: "⧉ ", with: "").trimmingCharacters(in: .whitespaces) }
+        let promptIndex = trimmed.lastIndex { ($0.hasPrefix("❯ ") || $0.hasPrefix("› ")) && $0.count > 2 && !isMenuOption($0) }
+        let prompt = promptIndex.map { String(trimmed[$0].dropFirst(2)).trimmingCharacters(in: .whitespaces) }
+
+        let from = (promptIndex ?? -1) + 1
+        guard from < trimmed.count else { return (prompt, nil) }
+        let replyStart = trimmed[from...].lastIndex { line in
+            guard line.hasPrefix("● ") || line.hasPrefix("• ") else { return false }
+            let rest = String(line.dropFirst(2))
+            return toolCall.firstMatch(in: rest, range: NSRange(location: 0, length: (rest as NSString).length)) == nil
+        }
+        guard let start = replyStart else { return (prompt, nil) }
+
+        var paragraphs: [String] = []
+        var current = String(trimmed[start].dropFirst(2))
+        for line in trimmed[(start + 1)...] {
+            if let c = line.first, stops.contains(c) { break }
+            if line.isEmpty {
+                if !current.isEmpty { paragraphs.append(current); current = "" }
+            } else if current.isEmpty || line.hasPrefix("- ") || line.hasPrefix("* ") || line.first?.isNumber == true && line.contains(". ") {
+                if !current.isEmpty { paragraphs.append(current) }
+                current = line
+            } else {
+                current += " " + line
+            }
+        }
+        if !current.isEmpty { paragraphs.append(current) }
+        let reply = paragraphs.joined(separator: "\n")
+        return (prompt, reply.isEmpty ? nil : reply)
+    }
+
+    private static func isMenuOption(_ line: String) -> Bool {
+        let rest = line.dropFirst(2)
+        return rest.first?.isNumber == true && rest.dropFirst().hasPrefix(".")
+    }
+}

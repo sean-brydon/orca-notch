@@ -147,6 +147,11 @@ struct Agent: Identifiable, Equatable {
     let worktreeIsActive: Bool
     let title: String
     let detail: String
+    let prompt: String?
+    let reply: String?
+    let toolName: String?
+    let toolInput: String?
+    let question: String?
     let interrupted: Bool
     let stateStartedAt: Double
     let updatedAt: Double
@@ -183,6 +188,11 @@ extension Agent {
         stateStartedAt = row.stateStartedAt ?? row.updatedAt ?? 0
         updatedAt = row.updatedAt ?? stateStartedAt
         terminalHandle = terminal?.handle
+        prompt = row.prompt
+        reply = row.lastAssistantMessage
+        toolName = row.toolName
+        toolInput = row.toolInput
+        question = row.interactivePrompt
 
         let terminalTitle = terminal?.title.map(Agent.stripSpinner).flatMap { $0.isEmpty ? nil : $0 }
         title = [row.taskTitle, row.displayName, terminalTitle, row.prompt.map(Agent.firstLine)]
