@@ -47,7 +47,7 @@ final class AgentStore: ObservableObject {
     private var screenTask: Task<Void, Never>?
 
     func start() {
-        guard pollTask == nil else { return }
+        guard pollTask == nil, !isDemo else { return }
         pollTask = Task { [weak self] in
             while !Task.isCancelled {
                 await self?.pollOnce()
@@ -212,6 +212,11 @@ final class AgentStore: ObservableObject {
 
     func refreshScreen() async {
         guard let agent = selectedAgent else { screenLines = []; return }
+        if isDemo {
+            let lines = demoScreens[agent.id] ?? []
+            if lines != screenLines { screenLines = lines }
+            return
+        }
         guard let handle = agent.terminalHandle else {
             screenStatus = "No live terminal found for this agent yet."
             return
@@ -231,6 +236,7 @@ final class AgentStore: ObservableObject {
 
     func send(_ text: String, enter: Bool) {
         guard let agent = selectedAgent, let handle = agent.terminalHandle else { return }
+        if isDemo { onDemoSend?(agent, text); return }
         sendError = nil
         Task {
             do {
@@ -252,5 +258,20 @@ final class AgentStore: ObservableObject {
                 NSWorkspace.shared.openApplication(at: url, configuration: NSWorkspace.OpenConfiguration(), completionHandler: nil)
             }
         }
+    }
+
+    // MARK: - Demo (mock data, no orca CLI)
+
+    private(set) var isDemo = false
+    var demoScreens: [String: [String]] = [:]
+    var onDemoSend: ((Agent, String) -> Void)?
+
+    func setDemo(hosts: [HostStatus], agents: [Agent], screens: [String: [String]]) {
+        isDemo = true
+        self.hosts = hosts
+        demoScreens = screens
+        agentsByHost = Dictionary(grouping: agents, by: \.hostLabel)
+        rebuild()
+        Task { await refreshScreen() }
     }
 }

@@ -15,6 +15,10 @@ final class NotchModel: ObservableObject {
     @Published var hardwareNotch = CGSize(width: 190, height: 32)
     @Published var screenHasNotch = true
     @Published var focusInputToken = 0
+    // Demo mode only: simulated cursor (stage coordinates) and typed reply text.
+    @Published var demoCursor: CGPoint?
+    @Published var demoCursorDown = false
+    @Published var demoTyping: String?
     @Published var soundEnabled: Bool = UserDefaults.standard.object(forKey: "soundEnabled") as? Bool ?? true {
         didSet { UserDefaults.standard.set(soundEnabled, forKey: "soundEnabled") }
     }

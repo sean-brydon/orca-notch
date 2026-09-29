@@ -69,6 +69,7 @@ struct AgentDetailPane: View {
             }
         }
         .onChange(of: model.focusInputToken) { _, _ in inputFocused = true }
+        .onChange(of: model.demoTyping) { _, typed in if let typed { draft = typed } }
     }
 
     private func header(_ agent: Agent) -> some View {

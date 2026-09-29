@@ -28,3 +28,11 @@ agent's `paneKey` (`tabId:leafId`) to a terminal handle, `terminal read --screen
 for the pull-down. The screen is plain text, so `TerminalStyler` recolours it from agent TUI shapes.
 
 Dev flags: `.build/debug/OrcaNotch --expanded` or `--peek-demo`.
+
+## Demo
+
+    swift build
+    .build/debug/OrcaNotch --demo                     # scripted demo with mock agents on a fake desktop
+    .build/debug/OrcaNotch --demo-record demo/out.mp4 # same, recording only the demo window (ScreenCaptureKit)
+
+The demo never calls the orca CLI; everything comes from `Sources/OrcaNotch/Demo.swift`.

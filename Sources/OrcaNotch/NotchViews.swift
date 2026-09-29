@@ -292,7 +292,7 @@ struct AgentListView: View {
         let rest = store.agents.filter { !$0.needsAttention && $0.state != .working }
 
         ScrollView {
-            LazyVStack(alignment: .leading, spacing: 3) {
+            VStack(alignment: .leading, spacing: 3) {
                 if store.agents.isEmpty {
                     VStack(spacing: 6) {
                         Image(systemName: "moon.zzz.fill").font(.system(size: 22)).foregroundStyle(dim)
@@ -323,6 +323,7 @@ struct AgentListView: View {
                 .padding(.bottom, 2)
             ForEach(agents) { agent in
                 AgentRowView(agent: agent, selected: agent.id == store.selectedID)
+                    .id(agent.attentionKey)
                     .onTapGesture { store.selectedID = agent.id }
             }
         }
@@ -351,7 +352,7 @@ struct AgentRowView: View {
                     Spacer(minLength: 4)
                     Text(ago(agent.stateStartedAt)).font(.system(size: 10)).foregroundStyle(dim)
                 }
-                Text(agent.detail)
+                Text(AgentCard.markdown(agent.detail))
                     .font(.system(size: 11))
                     .foregroundStyle(agent.needsAttention && agent.state != .done ? agent.state.color.opacity(0.9) : .white.opacity(0.6))
                     .lineLimit(2)

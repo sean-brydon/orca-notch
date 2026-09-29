@@ -2,10 +2,21 @@ import AppKit
 
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
-    private let controller = NotchController()
+    private var controller: NotchController?
+    private var demo: DemoDirector?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        controller.start()
+        let args = CommandLine.arguments
+        if let i = args.firstIndex(of: "--demo-record"), i + 1 < args.count {
+            demo = DemoDirector(recordTo: URL(fileURLWithPath: args[i + 1]))
+            demo?.start()
+        } else if args.contains("--demo") {
+            demo = DemoDirector(recordTo: nil)
+            demo?.start()
+        } else {
+            controller = NotchController()
+            controller?.start()
+        }
     }
 }
 
