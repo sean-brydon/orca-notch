@@ -2,7 +2,11 @@
 
 A macOS notch bar for [Orca](https://github.com/stablyai/orca). It watches every agent across
 local Orca plus all paired environments (`orca environment list`), tells you when one needs you, and
-pulls down a mini Orca: agent list + live terminal screen + reply box.
+pulls down a mini Orca: agent list, a card for each agent with one-click answers, and a reply box.
+
+![Orca Notch demo: an agent asks for permission, the notch peeks, the pull-down approves it, answers another agent's question and shows a finished task](docs/demo.gif)
+
+<sub>Recorded with mock agents via `--demo-record` (see [Demo](#demo)).</sub>
 
 ## Install
 

@@ -137,7 +137,7 @@ enum AgentState: String {
 }
 
 struct Agent: Identifiable, Equatable {
-    /// nil = local Orca runtime; otherwise the paired environment name (e.g. "personal/devl").
+    /// nil = local Orca runtime; otherwise the paired environment name (e.g. "work/devbox").
     let host: String?
     let paneKey: String
     let state: AgentState
